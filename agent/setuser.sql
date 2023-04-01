@@ -1,0 +1,12 @@
+set sql_log_bin=0;
+alter user user() identified by '123456';
+flush privileges;
+CREATE USER 'backup'@'%' identified by 'backup';
+flush privileges;
+grant replication slave on *.* to 'backup'@'%';
+flush privileges;
+update mysql.user set host = '%' where user = 'root';
+flush privileges;
+GRANT BACKUP_ADMIN ON *.* TO 'root'@'%';
+flush privileges;
+set sql_log_bin=1;

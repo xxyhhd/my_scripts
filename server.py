@@ -4,6 +4,8 @@ import time
 from condb import db
 import pymysql
 from rich.console import Console
+from mysql_scripts.remove_inst import remove_mysql
+
 
 
 console = Console()
@@ -144,6 +146,35 @@ def ass_resource():
         mysql.WriteToMysql("update ins_info set ins_name = '{0}', role = {1}, db_v = '{2}' where id = {3};".format(db_info[1], num - 1, db_info[0], res[0]))
         num += 1
         console.rule()
+    if len(host_res) == 3:
+        pass
+
+    elif len(host_res) == 2:
+        console.print('\n搭建主主复制', style="bold yellow")
+        build_slave(host_res[1][2], host_res[0][2], host_res[1][3], host_res[0][3])
+        build_slave(host_res[0][2], host_res[1][2], host_res[0][3], host_res[1][3])
+
+
+def build_slave(slave_host, slave_port, master_host, master_port, username='backup',passwd='backup'):
+    sql = "change master to master_host='{0}',master_port={1},master_user='{2}',master_password='{3}',master_auto_position=1; ".format(master_host, master_port, username, passwd)
+    os.system("/home/mysqls/versions/mysql-8.0.28-el7-x86_64/bin/mysql -h{0} -P{1} -p123456 -e \"{2}\"".format(slave_host, slave_port, sql))
+
+
+def remove_inst():
+    console.print('\n************** 2. 请输入你要删除的实例名 **************', style="bold yellow")
+    inst_name = input("\033[5;34m{0}\033[0m".format('请输入你要删除的实例名：'))
+    inst_name_double = input("\033[5;34m{0}\033[0m".format('请再次输入你要删除的实例名：'))
+    if inst_name != inst_name_double:
+        console.print('抱歉，两次输入实例名不一致\n', style="bold red")
+        return False
+    ins_info = mysql.ReadFromMysql('select * from ins_info where ins_name="{}"'.format(inst_name))
+    if len(ins_info) == 0:
+        console.print('抱歉，该实例名不存在\n', style="bold red") 
+        return False
+    for ins in ins_info:
+        if 'mysql' in ins[7]:
+            remove_mysql(ins[2], ins[3])
+    mysql.WriteToMysql("update ins_info set used=0, ins_name=NULL, role=NULL,db_v=NULL where ins_name='{}';".format(inst_name))
 
 
 def main():
@@ -157,6 +188,8 @@ def main():
             login_mysql()
         elif res == '4':
             pass
+        elif res == '8':
+            remove_inst()
         elif res == 'q':
             print('\n\n')
             return True

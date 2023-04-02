@@ -23,5 +23,5 @@ def remove_mysql(host, port):
             console.print('进程不存在或已经清理！！！！', style="bold yellow")
             break
     console.print('开始清理实例文件', style="bold yellow")
-    ssh_cli(host, 'rm -fr /dbs/mysqls/mysql4001')
+    ssh_cli(host, 'rm -fr /dbs/mysqls/mysql{0}'.format(port))
 

@@ -151,12 +151,12 @@ def ass_resource():
 
     elif len(host_res) == 2:
         console.print('\n搭建主主复制', style="bold yellow")
-        build_slave(host_res[1][2], host_res[0][2], host_res[1][3], host_res[0][3])
-        build_slave(host_res[0][2], host_res[1][2], host_res[0][3], host_res[1][3])
+        build_slave(host_res[1][2], host_res[1][3], host_res[0][2], host_res[0][3])
+        build_slave(host_res[0][2], host_res[0][3], host_res[1][2], host_res[1][3])
 
 
 def build_slave(slave_host, slave_port, master_host, master_port, username='backup',passwd='backup'):
-    sql = "change master to master_host='{0}',master_port={1},master_user='{2}',master_password='{3}',master_auto_position=1; ".format(master_host, master_port, username, passwd)
+    sql = "change master to master_host='{0}',master_port={1},master_user='{2}',master_password='{3}',master_auto_position=1; start slave;".format(master_host, master_port, username, passwd)
     os.system("/home/mysqls/versions/mysql-8.0.28-el7-x86_64/bin/mysql -h{0} -P{1} -p123456 -e \"{2}\"".format(slave_host, slave_port, sql))
 
 

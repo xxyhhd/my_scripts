@@ -1,0 +1,10 @@
+set sql_log_bin=0;
+UPDATE mysql.user SET Password = PASSWORD('123456') WHERE user = 'root';
+flush privileges;
+CREATE USER 'backup'@'%' identified by 'backup';
+flush privileges;
+grant replication slave on *.* to 'backup'@'%';
+flush privileges;
+update mysql.user set host = '%' where user = 'root' and host='localhost';
+flush privileges;
+set sql_log_bin=1;

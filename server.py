@@ -3,17 +3,20 @@ from generic_scripts.list_all_insts import list_insts
 from mysql_scripts.login_mysql import login_mysql
 from mysql_scripts.install_mysql import install_mysql
 from mysql_scripts.remove_inst import remove_mysql
+from mysql_scripts.full_backup_mysql import full_backup_mysql
+from mysql_scripts.stop_mysql import stop_mysql
+from mysql_scripts.start_mysql import start_mysql
 
 
 def get_action():
-    console.print('************** 请选择功能 **************', style="bold yellow")
+    console.print('\n************** 请选择功能 **************', style="bold yellow")
     console.print(' 1：安装实例            2：查看实例列表\n 3：登录实例            4：启动实例\n 5：停止实例            6：手动备份实例\n 7：备库重搭            8：删除实例\n q：退出', style="bold yellow")
     return (input("\033[5;34m{0}\033[0m".format('\n你的选择：')))
 
 
 def login_db():
-    console.print('************** 输入实例名 **************', style="bold yellow")
-    inst_name = input("\033[5;34m{0}\033[0m".format('请输入实例名（默认dbaas）：')) or 'dbaas'
+    console.print('\n************** 输入实例名 **************', style="bold yellow")
+    inst_name = input("\033[5;34m{0}\033[0m".format('请输入实例名（默认登录dbaas）：')) or 'dbaas'
     inst_info = dbaas.ReadFromMysql('select ip, port, db_v from ins_info where ins_name = "{}" order by role'.format(inst_name))
     if len(inst_info) == 0:
         console.print('实例不存在\n\n', style="bold red")
@@ -56,6 +59,53 @@ def remove_db():
         console.print('该实例不存在！！！！', style="bold red")       
 
 
+def backup_db():
+    console.print('\n************** 开始临时备份实例 **************', style="bold yellow")
+    inst_name = input("\033[5;34m{0}\033[0m".format('请输入实例名：'))
+    inst_info = dbaas.ReadFromMysql('select ip, port, db_v from ins_info where ins_name = "{}" order by role'.format(inst_name))
+    if len(inst_info) == 0:
+        console.print('实例不存在\n\n', style="bold red")
+        return False
+    if 'mysql' in inst_info[0][2]:
+        full_backup_mysql(inst_info)
+    elif 'redis' in inst_info[0][2]:
+        pass
+    elif 'redis' in inst_info[0][2]:
+        pass
+
+
+def stop_db():
+    console.print('\n************** 开始停止实例 **************', style="bold yellow")
+    inst_name = input("\033[5;34m{0}\033[0m".format('请输入实例名：'))
+    inst_info = dbaas.ReadFromMysql('select ip, port, db_v from ins_info where ins_name = "{}" order by role'.format(inst_name))
+    if len(inst_info) == 0:
+        console.print('实例不存在\n\n', style="bold red")
+        return False
+    if 'mysql' in inst_info[0][2]:
+        for inst in inst_info:
+            stop_mysql(inst[0], inst[1])
+    elif 'redis' in inst_info[0][2]:
+        pass
+    elif 'redis' in inst_info[0][2]:
+        pass
+
+
+def start_db():
+    console.print('\n************** 开始启动实例 **************', style="bold yellow")
+    inst_name = input("\033[5;34m{0}\033[0m".format('请输入实例名：'))
+    inst_info = dbaas.ReadFromMysql('select ip, port, db_v from ins_info where ins_name = "{}" order by role'.format(inst_name))
+    if len(inst_info) == 0:
+        console.print('实例不存在\n\n', style="bold red")
+        return False
+    if 'mysql' in inst_info[0][2]:
+        for inst in inst_info:
+            start_mysql(inst[0], inst[1])
+    elif 'redis' in inst_info[0][2]:
+        pass
+    elif 'redis' in inst_info[0][2]:
+        pass
+
+
 def main():
     while True:
         action = get_action()
@@ -65,6 +115,12 @@ def main():
             list_insts()
         if action == '3':
             login_db()
+        if action == '4':
+            start_db()
+        if action == '5':
+            stop_db()
+        if action == '6':
+            backup_db()
         if action == '8':
             remove_db()
         if action == 'q':

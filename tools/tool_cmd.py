@@ -15,7 +15,7 @@ def ToolsCmd(command):
 def ssh_cli(host, command):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(hostname=host, port=22, username='root',password='123456')
+    ssh.connect(hostname=host, port=22, username='root',password='123456', timeout=3600)
     stdint, stdout, stderr = ssh.exec_command(command)
     res = (stdout.read().decode('utf8'), stderr.read().decode('utf8'))
     ssh.close()

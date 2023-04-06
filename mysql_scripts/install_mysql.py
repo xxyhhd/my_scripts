@@ -1,6 +1,7 @@
 from generic_scripts.gen_class import dbaas, console
 from tools.tool_cmd import ssh_cli
 from mysql_scripts.check_mysql_process import check_mysqld_porcess
+from mysql_scripts.start_mysql import start_mysql
 import os
 import time
 import re
@@ -42,8 +43,8 @@ def make_dir(db_version, host, port):
     ssh_cli(host, 'ln -s {0} /dbs/mysqls/mysql{1}/service'.format(package_path, port))
     ssh_cli(host, 'chown -R mysql.mysql /dbs/mysqls/mysql{0}'.format(port))
     ssh_cli(host, 'chmod -R 755 /dbs/mysqls/mysql{0}'.format(port))
-    os.system('scp /root/my_scripts/agent/setuser.sql {}:/tmp/setuser.sql'.format(host))
-    os.system('scp /root/my_scripts/agent/setuser56.sql {}:/tmp/setuser56.sql'.format(host))
+    os.system('scp /root/my_scripts/mysql_scripts/setuser.sql {}:/tmp/setuser.sql'.format(host))
+    os.system('scp /root/my_scripts/mysql_scripts/setuser56.sql {}:/tmp/setuser56.sql'.format(host))
     os.system('scp /root/my_scripts/mysql_scripts/mytemp.cnf {}:/etc/my{}.cnf'.format(host, port))
     ssh_cli(host, "sed -i 's/xuxy19/{0}/g' /etc/my{0}.cnf".format(port))
     ssh_cli(host, "sed -i 's/xuxy20/{0}/g' /etc/my{1}.cnf".format(host.split('.')[-1], port))
@@ -59,7 +60,7 @@ def init_mysql(host, port, db_v):
             a = ssh_cli(host, 'ps -ef |grep mysql_install_db |grep my{0} |grep -v grep |wc -l'.format(port))[0].rstrip() 
             if a == '0':
                 break
-            time.sleep(30)
+            time.sleep(60)
         if  len(re.findall('OK', init_result[0])) == 2:
             console.print('MySQL初始化成功', style="bold green", highlight=True)
             return True
@@ -80,15 +81,15 @@ def init_mysql(host, port, db_v):
     return False
 
 
-def start_mysql(host, port):
-    console.print('开始起服务', style="bold yellow", highlight=True)
-    os.system('ssh {0} -t /dbs/mysqls/mysql{1}/service/bin/mysqld_safe --defaults-file=/etc/my{1}.cnf & '.format(host, port))
-    time.sleep(20)
-    if ssh_cli(host, 'ps -ef |grep mysqld |grep my{0} |grep -v grep |wc -l'.format(port))[0].strip() == '2':
-        console.print('服务启动成功', style="bold green", highlight=True)
-        return True
-    console.print('服务启动失败，请手动检查', style="bold red", highlight=True)
-    return False
+# def start_mysql(host, port):
+#     console.print('开始起服务', style="bold yellow", highlight=True)
+#     os.system('ssh {0} -t /dbs/mysqls/mysql{1}/service/bin/mysqld_safe --defaults-file=/etc/my{1}.cnf & '.format(host, port))
+#     time.sleep(20)
+#     if ssh_cli(host, 'ps -ef |grep mysqld |grep my{0} |grep -v grep |wc -l'.format(port))[0].strip() == '2':
+#         console.print('服务启动成功', style="bold green", highlight=True)
+#         return True
+#     console.print('服务启动失败，请手动检查', style="bold red", highlight=True)
+#     return False
 
 
 def init_user(host, port, db_v):

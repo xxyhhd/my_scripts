@@ -208,4 +208,5 @@ def main():
     print('结果集存放目录：' + command[1])
 
 
-main()
+if __name__ == '__main__':  
+    main()

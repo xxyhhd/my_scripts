@@ -81,17 +81,6 @@ def init_mysql(host, port, db_v):
     return False
 
 
-# def start_mysql(host, port):
-#     console.print('开始起服务', style="bold yellow", highlight=True)
-#     os.system('ssh {0} -t /dbs/mysqls/mysql{1}/service/bin/mysqld_safe --defaults-file=/etc/my{1}.cnf & '.format(host, port))
-#     time.sleep(20)
-#     if ssh_cli(host, 'ps -ef |grep mysqld |grep my{0} |grep -v grep |wc -l'.format(port))[0].strip() == '2':
-#         console.print('服务启动成功', style="bold green", highlight=True)
-#         return True
-#     console.print('服务启动失败，请手动检查', style="bold red", highlight=True)
-#     return False
-
-
 def init_user(host, port, db_v):
     console.print('初始化账号权限', style="bold yellow", highlight=True)
     if '5.6' in db_v:

@@ -6,6 +6,7 @@ from mysql_scripts.remove_inst import remove_mysql
 from mysql_scripts.full_backup_mysql import full_backup_mysql
 from mysql_scripts.stop_mysql import stop_mysql
 from mysql_scripts.start_mysql import start_mysql
+from redis_scripts.install_redis import install_redis
 
 
 def get_action():
@@ -38,7 +39,7 @@ def install_db():
     if db_type == '1':
         install_mysql()
     elif db_type == '2':
-        pass
+        install_redis()
     elif db_type == '3':
         pass
     else:

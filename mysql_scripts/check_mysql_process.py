@@ -1,9 +1,5 @@
 from tools.tool_cmd import ssh_cli
-# from rich.console import Console
 from generic_scripts.gen_class import console
-
-
-# console = Console()
 
 
 def check_mysqld_porcess(host, port):

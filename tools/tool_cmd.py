@@ -12,7 +12,7 @@ def ToolsCmd(command):
         return False
 
 
-def ssh_cli(host, command,username='root',password='123456'):
+def ssh_cli(host, command, username='root', password=None):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(hostname=host, port=22, username=username, password=password, timeout=3600)

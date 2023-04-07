@@ -7,6 +7,15 @@ from mysql_scripts.full_backup_mysql import full_backup_mysql
 from mysql_scripts.stop_mysql import stop_mysql
 from mysql_scripts.start_mysql import start_mysql
 from redis_scripts.install_redis import install_redis
+from redis_scripts.login_redis import login_redis
+from redis_scripts.start_redis import start_redis
+from redis_scripts.stop_redis import stop_redis
+from redis_scripts.remove_redis import remove_redis
+from pgsql_scripts.install_pgsql import install_pgsql
+from pgsql_scripts.login_pgsql import login_pgsql
+from pgsql_scripts.start_pgsql import start_pgsql
+from pgsql_scripts.stop_pgsql import stop_pgsql
+from pgsql_scripts.remove_pgsql import remove_pgsql
 
 
 def get_action():
@@ -25,9 +34,9 @@ def login_db():
     if 'mysql' in inst_info[0][2]:
         login_mysql(inst_info)
     elif 'redis' in inst_info[0][2]:
-        pass
-    elif 'redis' in inst_info[0][2]:
-        pass
+        login_redis(inst_info)
+    elif 'postgres' in inst_info[0][2]:
+        login_pgsql(inst_info)
 
 
 def install_db():
@@ -41,7 +50,7 @@ def install_db():
     elif db_type == '2':
         install_redis()
     elif db_type == '3':
-        pass
+        install_pgsql()
     else:
         console.print('很抱歉，参数不合法！！！', style="bold red")
 
@@ -54,6 +63,10 @@ def remove_db():
         for inst in inst_info:
             if inst[2] == 'mysql':
                 remove_mysql(inst[0], inst[1])
+            if inst[2] == 'redis':
+                remove_redis(inst[0], inst[1])
+            elif inst[2] == 'pgsql':
+                remove_pgsql(inst[0], inst[1])
         dbaas.WriteToMysql("update ins_info set used=0, ins_name=NULL, role=NULL,db_v=NULL where ins_name='{}';".format(inst_name))
         console.print('实例已删除', style="bold green")
     else:
@@ -71,7 +84,7 @@ def backup_db():
         full_backup_mysql(inst_info)
     elif 'redis' in inst_info[0][2]:
         pass
-    elif 'redis' in inst_info[0][2]:
+    elif 'pgsql' in inst_info[0][2]:
         pass
 
 
@@ -86,9 +99,11 @@ def stop_db():
         for inst in inst_info:
             stop_mysql(inst[0], inst[1])
     elif 'redis' in inst_info[0][2]:
-        pass
-    elif 'redis' in inst_info[0][2]:
-        pass
+        for inst in inst_info:
+            stop_redis(inst[0], inst[1])
+    elif 'postgres' in inst_info[0][2]:
+        for inst in inst_info:
+            stop_pgsql(inst[0], inst[1])
 
 
 def start_db():
@@ -102,9 +117,11 @@ def start_db():
         for inst in inst_info:
             start_mysql(inst[0], inst[1])
     elif 'redis' in inst_info[0][2]:
-        pass
-    elif 'redis' in inst_info[0][2]:
-        pass
+        for inst in inst_info:
+            start_redis(inst[0], inst[1])
+    elif 'postgres' in inst_info[0][2]:
+        for inst in inst_info:
+            start_pgsql(inst[0], inst[1])
 
 
 def main():

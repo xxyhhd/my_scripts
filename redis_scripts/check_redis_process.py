@@ -9,6 +9,6 @@ def check_redis_porcess(host, port):
     else:
         print(redis_proc_info)
         redis_process_num = ssh_cli(host, "ps -ef |grep redis-server |grep :%s |grep -v grep | awk '{print $2}'"%(port))[0].strip()
-        redis_kill_cmd = 'kill - 9 {};'.format(redis_process_num)
+        redis_kill_cmd = 'kill -9 {};'.format(redis_process_num)
         return(redis_kill_cmd)
 

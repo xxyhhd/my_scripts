@@ -65,7 +65,7 @@ def remove_db():
                 remove_mysql(inst[0], inst[1])
             if inst[2] == 'redis':
                 remove_redis(inst[0], inst[1])
-            elif inst[2] == 'pgsql':
+            elif inst[2] == 'postgresql':
                 remove_pgsql(inst[0], inst[1])
         dbaas.WriteToMysql("update ins_info set used=0, ins_name=NULL, role=NULL,db_v=NULL where ins_name='{}';".format(inst_name))
         console.print('实例已删除', style="bold green")

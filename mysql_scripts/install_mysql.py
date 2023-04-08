@@ -1,4 +1,5 @@
 from generic_scripts.gen_class import dbaas, console
+from generic_scripts.ass_resource import ass_resource
 from tools.tool_cmd import ssh_cli
 from mysql_scripts.check_mysql_process import check_mysqld_porcess
 from mysql_scripts.start_mysql import start_mysql
@@ -108,29 +109,29 @@ def install_mysql():
     console.print('\n************** 请选择实例规格 **************', style="bold yellow")
     for k, v in norms_norm.items():
         console.print('{0}: {1}'.format(k,v), style="bold yellow")
-    inst_norm = input("\033[5;34m{0}\033[0m".format('请输入你的选择（默认双节点）：')) or '2'   # 实例规格
-    inst_norm = int(inst_norm)
+    inst_num = input("\033[5;34m{0}\033[0m".format('请输入你的选择（默认双节点）：')) or '2'   # 实例规格
+    inst_num = int(inst_num)
 
     # 获取实例名
     inst_name = input("\033[5;34m{0}\033[0m".format('请输入实例名：'))   # 实例名
     inst_name_check = dbaas.ReadFromMysql('select count(*) from ins_info where ins_name = "{}";'.format(inst_name))[0][0]
 
     # 参数合法性判断
-    if db_version not in ('1', '2', '3') or inst_norm > 3 or inst_name_check != 0 or inst_name == '':
+    if db_version not in ('1', '2', '3') or inst_num > 3 or inst_name_check != 0 or inst_name == '':
         console.print('参数不合法或实例名已存在', style="bold red")
         return False
 
-    where = ''
     db_v = norms_db[db_version]
-    insts = {}
-    for x in range(inst_norm):
-        inst_info = dbaas.RWMsql(('select id into @id from ins_info where used = 0 and db_type = "mysql" {} group by ip order by count(ip) desc limit 1 for update;'.format(where), 'update ins_info set used = 1 where id=@id;', 'select id, ip, port from ins_info where id = @id;'))
-        id, ip, port = inst_info[1][0]
-        if x == 0:
+    inst_resource = ass_resource(inst_num, db_v.split('-')[0])
+    if not inst_resource:
+        return False
+    for resource in inst_resource:
+        id, ip, port = inst_resource[resource]
+        if resource == 0:
             role = 'master'
-        elif x == 1:
+        elif resource == 1:
             role = 'slave '
-        elif x == 2:
+        elif resource == 2:
             role = 'logger'
         console.print('开始安装：{0}, ip：{1}, port：{2}'.format(role, ip, port), style="bold yellow")
         if not check_proc_exists(ip, port):
@@ -143,22 +144,19 @@ def install_mysql():
         if not start_mysql(ip, port):
             return False
         init_user(ip, port, db_v)
-        insts[x] = '{}:{}'.format(ip, port)
-        # where 下一次分配资源过滤已分配的主机
-        where = where + 'and ip !="{0}" '.format(ip) 
-        dbaas.WriteToMysql('update ins_info set ins_name = "{0}", role = {1}, db_v = "{2}" where id={3};'.format(inst_name, x, db_v, id))
+        dbaas.WriteToMysql('update ins_info set ins_name = "{0}", role = {1}, db_v = "{2}" where id={3};'.format(inst_name, resource, db_v, id))
 
     console.print('开始搭建复制关系', style="bold yellow")    
-    if len(insts) == 1:
+    if len(inst_resource) == 1:
         return True
-    elif len(insts) == 2:
-        build_slave(insts.get(1).split(':')[0], insts.get(1).split(':')[1], insts.get(0).split(':')[0], insts.get(0).split(':')[1])
-        build_slave(insts.get(0).split(':')[0], insts.get(0).split(':')[1], insts.get(1).split(':')[0], insts.get(1).split(':')[1])
+    elif len(inst_resource) == 2:
+        build_slave(inst_resource.get(1)[1], inst_resource.get(1)[2], inst_resource.get(0)[1], inst_resource.get(0)[2])
+        build_slave(inst_resource.get(0)[1], inst_resource.get(0)[2], inst_resource.get(1)[1], inst_resource.get(1)[2])
         return True
-    elif len(insts) == 3:
-        build_slave(insts.get(1).split(':')[0], insts.get(1).split(':')[1], insts.get(0).split(':')[0], insts.get(0).split(':')[1])
-        build_slave(insts.get(0).split(':')[0], insts.get(0).split(':')[1], insts.get(1).split(':')[0], insts.get(1).split(':')[1])
-        build_slave(insts.get(2).split(':')[0], insts.get(2).split(':')[1], insts.get(0).split(':')[0], insts.get(0).split(':')[1])      
+    elif len(inst_resource) == 3:
+        build_slave(inst_resource.get(1)[1], inst_resource.get(1)[2], inst_resource.get(0)[1], inst_resource.get(0)[2])
+        build_slave(inst_resource.get(0)[1], inst_resource.get(0)[2], inst_resource.get(1)[1], inst_resource.get(1)[2])
+        build_slave(inst_resource.get(2)[1], inst_resource.get(2)[2], inst_resource.get(0)[1], inst_resource.get(0)[2])      
         return True  
 
 

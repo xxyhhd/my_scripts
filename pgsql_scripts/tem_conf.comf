@@ -1,0 +1,61 @@
+port = xuxy19
+max_connections = 100                   # (change requires restart)
+shared_buffers = 128MB                  # min 128kB
+dynamic_shared_memory_type = posix      # the default is usually the first option
+max_wal_size = 1GB
+min_wal_size = 80MB
+log_timezone = 'Asia/Shanghai'
+datestyle = 'iso, mdy'
+timezone = 'Asia/Shanghai'
+lc_messages = 'en_US.UTF-8'                     # locale for system error message
+lc_monetary = 'en_US.UTF-8'                     # locale for monetary formatting
+lc_numeric = 'en_US.UTF-8'                      # locale for number formatting
+lc_time = 'en_US.UTF-8'                         # locale for time formatting
+default_text_search_config = 'pg_catalog.english'
+
+
+
+
+# 监听所有IP
+listen_addresses = "0.0.0.0"
+# 最大连接数，据说从机需要大于或等于该值
+max_connections = 200
+# 设置主pgsql为生成wal的主机，9.6开始没有hot_standby（热备模式）
+wal_level = replica
+
+# 开启连续归档
+archive_mode = on
+#归档命令。-o "StrictHostKeyChecking no" 作用是取消第一次连接输入yes或者no
+archive_command = 'scp -o "StrictHostKeyChecking no" %p pgslave.ptcloud.t.home:/data/postgresql-12/archive/%f'
+# archive_command = 'test ! -f /data/postgresql-12/archive/%f && scp %p pgslave.ayunw.cn:/data/postgresql-12/archive/%f'
+archive_cleanup_command = '/usr/local/postgresql-12/bin/pg_archivecleanup -d /data/postgresql-12/data/pg_wal %r >> /data/postgresql-12/log/archive_cleanup.log 2>&1'
+# 最多有16个流复制连接。
+max_wal_senders = 16
+# 设置流服务保留的最多wal(老版本叫xlog)文件个数
+wal_keep_segments = 256
+# 数据堆清理的最大进程
+autovacuum_max_workers = 2
+max_worker_processes = 16
+max_logical_replication_workers = 10
+# 日志设置
+log_destination = 'stderr'
+logging_collector = on
+log_directory = '/data/postgresql-12/log'
+log_filename = 'postgresql-%w.log'
+log_file_mode = 0600
+log_truncate_on_rotation = on
+log_rotation_age = 1d
+log_rotation_size = 1GB
+
+log_min_messages = error
+# 执行超过300ms的sql语句会记录到pgsql的日志文件,类似于慢日志
+# 一般设置300ms就好，慢日志会打到pgsql日志文件，方便查问题
+log_min_duration_statement = 300
+log_checkpoints = on
+log_connections = on
+log_disconnections = on
+log_error_verbosity = verbose
+log_hostname = on
+log_line_prefix = '%m [%p] '
+log_lock_waits = on 
+log_statement = 'ddl'

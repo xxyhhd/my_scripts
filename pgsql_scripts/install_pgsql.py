@@ -45,6 +45,11 @@ def make_pgsql_dir(db_version, host, port):
     ssh_cli(host, "sed -i 's/#listen_addresses = 'localhost'/listen_addresses = '*'/g' /dbs/pgsql/pgsql{}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
     ssh_cli(host, "sed -i 's/#port = 5432 /port = {0} /g' /dbs/pgsql/pgsql{0}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
 
+    #ssh_cli(host, "sed -i 's/#archive_mode = off/archive_mode = on/g' /dbs/pgsql/pgsql{0}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
+
+
+
+
 
 def init_pgsql(host, port):
     console.print('开始初始化pgsql', style="bold yellow", highlight=True)
@@ -98,4 +103,5 @@ def install_pgsql():
         init_pgsql(ip, port)
         start_pgsql(ip, port)
         dbaas.WriteToMysql('update ins_info set ins_name = "{0}", role = {1}, db_v = "{2}" where id={3};'.format(inst_name, resource, db_v, id))
+
 

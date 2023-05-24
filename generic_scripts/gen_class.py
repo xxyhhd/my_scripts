@@ -4,9 +4,5 @@ from rich.console import Console
 
 
 console = Console()
-# table = Table()
-# table.add_column('[blue]insname')
-# table.add_column('[blue]db_type')
-# table.add_column('[blue]vip_host')
-# table.add_column('[blue]vip_port')
-dbaas = db('192.168.122.102', 'dbaas', 3306)
+
+dbaas = db('127.0.0.1', 'dbaas', 3306)

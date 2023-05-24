@@ -3,6 +3,7 @@ from generic_scripts.ass_resource import ass_resource
 from tools.tool_cmd import ssh_cli
 from redis_scripts.check_redis_process import check_redis_porcess
 from redis_scripts.start_redis import start_redis
+import os
 
 
 def check_redis_proc_exists(host, port):
@@ -75,7 +76,6 @@ def install_redis():
         return False
     
     db_v = norms_db[db_version]
-    print(db_v.split('-')[0])
     inst_resource = ass_resource(inst_num, db_v.split('-')[0])
     if not inst_resource:
         return False
@@ -95,7 +95,9 @@ def install_redis():
         make_redis_dir(db_v, ip, port)
         start_redis(ip, port)
         dbaas.WriteToMysql('update ins_info set ins_name = "{0}", role = {1}, db_v = "{2}" where id={3};'.format(inst_name, resource, db_v, id))
-
+        if resource in (1, 2):
+            console.print('开始创建主从复制', style="bold yellow")
+            os.system('/home/redis/versions/redis-7.0.8/bin/redis-cli -h {0} -p {1} replicaof {2} {3}'.format(ip, port, inst_resource[0][1], inst_resource[0][2]))
 
 
  

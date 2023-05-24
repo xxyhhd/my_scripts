@@ -1,6 +1,7 @@
 import pymysql
 import re
 from warnings import filterwarnings
+import psycopg2
 
 
 filterwarnings("error",category=pymysql.Warning)
@@ -64,5 +65,23 @@ class db():
         except pymysql.Error as e:
             return (repr(e))
 
-    
 
+    def ReadFromPgsql(self, sql):
+        # try:
+        conn = psycopg2.connect(
+            host=self.host, port=self.port, user=self.user, password=self.passwd, database=self.dbname)
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        conn.close()
+        return res
+        # except:
+        #     return 2222
+
+
+    def WriteToPgsql(self, sql):
+        pass
+
+
+    def RWPgsql(self, sqls):
+        pass

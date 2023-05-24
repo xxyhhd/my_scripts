@@ -16,6 +16,7 @@ from pgsql_scripts.login_pgsql import login_pgsql
 from pgsql_scripts.start_pgsql import start_pgsql
 from pgsql_scripts.stop_pgsql import stop_pgsql
 from pgsql_scripts.remove_pgsql import remove_pgsql
+from start_ops import start_ops
 
 
 def get_action():
@@ -143,6 +144,8 @@ def main():
             remove_db()
         if action == 'q':
             return False
+        if action == 'r':
+            start_ops()
 
 
 if __name__ == "__main__":

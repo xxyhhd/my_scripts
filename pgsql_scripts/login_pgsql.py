@@ -13,4 +13,4 @@ def login_pgsql(inst_info):
     if inst_role > len(inst_info) - 1:
         console.print('抱歉，该实例不存在所选角色', style="bold red")
         return False
-    os.system('ssh {0} -t "/dbs/pgsql/pgsql{1}/service/bin/psql -U pgsql{1} postgres"'.format(inst_info[inst_role][0], inst_info[inst_role][1]))
+    os.system('ssh {0} -t "/dbs/pgsql/pgsql{1}/service/bin/psql -U pgsql{1} -p{1} postgres"'.format(inst_info[inst_role][0], inst_info[inst_role][1]))

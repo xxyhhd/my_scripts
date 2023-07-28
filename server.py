@@ -17,12 +17,24 @@ from pgsql_scripts.start_pgsql import start_pgsql
 from pgsql_scripts.stop_pgsql import stop_pgsql
 from pgsql_scripts.remove_pgsql import remove_pgsql
 from start_ops import start_ops
+# from kvm_scripts.kvm import create_vm, remove_vm
+
+
+def get_action_old():
+    console.print('\n************** 请选择功能 **************', style="bold yellow")
+    console.print(' 1：安装实例            2：查看实例列表\n 3：登录实例            4：启动实例\n 5：停止实例            6：手动备份实例\n 7：备库重搭            8：删除实例\n q：退出', style="bold yellow")
+    return (input("\033[5;34m{0}\033[0m".format('\n你的选择：')))
 
 
 def get_action():
     console.print('\n************** 请选择功能 **************', style="bold yellow")
-    console.print(' 1：安装实例            2：查看实例列表\n 3：登录实例            4：启动实例\n 5：停止实例            6：手动备份实例\n 7：备库重搭            8：删除实例\n q：退出', style="bold yellow")
+    console.print(' 1：安装实例            2：查看实例列表\n 3：登录实例            4：启动实例\n 5：停止实例            6：手动备份实例\n 7：备库重搭            8：删除实例\n q：退出\n-------------------------------------\n a：创建vm              b：删除vm\n r：环境恢复', style="bold yellow")
     return (input("\033[5;34m{0}\033[0m".format('\n你的选择：')))
+
+
+
+
+
 
 
 def login_db():
@@ -146,7 +158,6 @@ def main():
             return False
         if action == 'r':
             start_ops()
-
 
 if __name__ == "__main__":
     main()

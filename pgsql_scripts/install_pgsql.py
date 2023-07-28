@@ -42,11 +42,7 @@ def make_pgsql_dir(db_version, host, port):
     ssh_cli(host, 'echo pgsql{}:pass1314|chpasswd'.format(port))
     ssh_cli(host, 'chown pgsql{0} /dbs/pgsql/pgsql{0}'.format(port))
     ssh_cli(host, 'ln -s {0} /dbs/pgsql/pgsql{1}/service '.format(pgsql_package_path, port), 'pgsql{}'.format(port), 'pass1314')
-    ssh_cli(host, "sed -i 's/#listen_addresses = 'localhost'/listen_addresses = '*'/g' /dbs/pgsql/pgsql{}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
-    ssh_cli(host, "sed -i 's/#port = 5432 /port = {0} /g' /dbs/pgsql/pgsql{0}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
-
-    #ssh_cli(host, "sed -i 's/#archive_mode = off/archive_mode = on/g' /dbs/pgsql/pgsql{0}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
-
+    
 
 
 
@@ -54,6 +50,10 @@ def make_pgsql_dir(db_version, host, port):
 def init_pgsql(host, port):
     console.print('开始初始化pgsql', style="bold yellow", highlight=True)
     init_result = ssh_cli(host, '/dbs/pgsql/pgsql{0}/service/bin/initdb -D /dbs/pgsql/pgsql{0}/data'.format(port), username='pgsql{}'.format(port), password='pass1314')
+    ssh_cli(host, "sed -i 's/#listen_addresses = 'localhost'/listen_addresses = '*'/g' /dbs/pgsql/pgsql{}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
+    ssh_cli(host, "sed -i 's/#port = 5432 /port = {0} /g' /dbs/pgsql/pgsql{0}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
+
+    #ssh_cli(host, "sed -i 's/#archive_mode = off/archive_mode = on/g' /dbs/pgsql/pgsql{0}/data/postgresql.conf".format(port), username='pgsql{}'.format(port), password='pass1314')
 
 
 def install_pgsql():
